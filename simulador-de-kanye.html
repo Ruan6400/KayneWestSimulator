@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanye Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="img/kanyeicon.png">
+</head>
+<body>
+    <div class="header">
+        <img src="img/kanyeicon.png" alt="Kanye West">
+        <div class="header-title">Kanye West Adventures</div>
+    </div>
+    <div class="menu">
+        <div><a href="index.html" style="color: inherit; text-decoration: none;">Home</a></div>
+        <div><a href="simulador-de-kanye.html" style="color: inherit; text-decoration: none;">Kanye Simulator</a></div>
+        <div><a href="como-funciona.html" style="color: inherit; text-decoration: none;">How it works</a></div>
+    </div>
+    </div>
+    <div class="container">
+        <div class="tweet-box">
+            <h3>Tweet!</h3>
+            <textarea id="tweet-input" placeholder="Enter your tweet here..."></textarea>
+            <button class="create-button" onclick="createTweet()">Create</button>
+            <button class="update-button" onclick="updateTweet()">Update</button>
+            <button class="delete-button" onclick="deleteTweet()">Delete</button>
+        </div>
+        <div class="tweet-list">
+            <h3>All Tweets</h3>
+            <ul id="tweet-list">
+            </ul>
+        </div>
+    </div>
+    <script> // aqui tu apaga tbm e bota oq ce fez
+        let Dados = localStorage;
+        Postagens = Dados.Posts;
+        Postagens = Postagens.split(',');
+        let tweets = [];
+        for(let i=0;i < Postagens.length;i++){
+          if(Postagens[i].includes(';')){
+            let newpost=''
+            for(let j=0;j < Postagens[i].length;j++){
+              Postagens[i][j] == ';' ? newpost+=',':
+                newpost+=Postagens[i][j];
+            }
+            tweets.push(newpost);
+          }else{
+            tweets.push(Postagens[i]);
+          }
+        }
+        
+        let currentTweetIndex = -1;
+
+        function createTweet() {
+            const tweetInput = document.getElementById('tweet-input').value;
+            if (tweetInput) {
+                tweets.push(tweetInput);
+                if(tweetInput.includes(',')){
+                  let newpost = ''
+                  for(let i=0;i < tweetInput.length;i++){
+                    tweetInput[i] == ',' ? newpost+=';':
+                      newpost+=tweetInput[i];
+                  }
+                  Postagens.push(newpost);
+                }else{
+                  Postagens.push(tweetInput);
+                }
+                Dados.setItem("Posts",Postagens)
+                document.getElementById('tweet-input').value = '';
+                renderTweets();
+            } else {
+                alert('Please enter a tweet.');
+            }
+        }
+
+         
+        function updateTweet() {
+            const tweetInput = document.getElementById('tweet-input').value;
+            if (currentTweetIndex > -1 && tweetInput) {
+                if(tweetInput.includes(',')){
+                  let newpost = ''
+                  for(let i=0;i < tweetInput.length;i++){
+                    tweetInput[i] == ',' ? newpost+=';':
+                      newpost+=tweetInput[i];
+                  }
+                  Postagens[currentTweetIndex] = newpost;
+                }else{
+                  Postagens[currentTweetIndex] = tweetInput;
+                }
+                Dados.setItem("Posts",Postagens)
+                tweets[currentTweetIndex] = tweetInput;
+                document.getElementById('tweet-input').value = '';
+                currentTweetIndex = -1;
+                renderTweets();
+            } else {
+                alert('Please select a tweet to update.');
+            }
+        }
+
+        function deleteTweet() {
+            if (currentTweetIndex > -1) {
+                tweets.splice(currentTweetIndex, 1);
+                Postagens.splice(currentTweetIndex, 1);
+                Dados.setItem("Posts",Postagens)
+                document.getElementById('tweet-input').value = '';
+                currentTweetIndex = -1;
+                renderTweets();
+            } else {
+                alert('Please select a tweet to delete.');
+            }
+        }
+
+        function renderTweets() {
+            const tweetList = document.getElementById('tweet-list');
+            tweetList.innerHTML = '';
+            tweets.forEach((tweet, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = tweet;
+                listItem.onclick = () => {
+                    document.getElementById('tweet-input').value = tweet;
+                    currentTweetIndex = index;
+                };
+                tweetList.appendChild(listItem);
+            });
+        }
+        
+        renderTweets();
+    </script>
+</body>
+</html>
